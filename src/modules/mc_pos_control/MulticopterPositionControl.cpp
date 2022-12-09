@@ -306,7 +306,7 @@ void MulticopterPositionControl::Run()
 
 	/*** CUSTOM ***/
 	float sin_yaw, cos_yaw;
-
+	vehicle_attitude_setpoint_s vehicle_attitutude_setpoint_read;
 	/*** END-CUSTOM ***/
 
 	// reschedule backup
@@ -513,6 +513,9 @@ void MulticopterPositionControl::Run()
 
 			/*** CUSTOM ***/
 			if( _param_tilting_type.get() == 1){
+
+				_vehicle_attitude_setpoint_sub.update(&vehicle_attitutude_setpoint_read);
+
 				sin_yaw = sinf(attitude_setpoint.yaw_body);
 				cos_yaw = cosf(attitude_setpoint.yaw_body);
 
@@ -523,6 +526,15 @@ void MulticopterPositionControl::Run()
 				attitude_setpoint.thrust_body[1] = -sin_yaw * local_pos_sp.thrust[0] + cos_yaw * local_pos_sp.thrust[1];
 				attitude_setpoint.thrust_body[1] = math::constrain(attitude_setpoint.thrust_body[1],
 							-1.0f*_param_f_max.get(), _param_f_max.get());
+
+				attitude_setpoint.roll_body = vehicle_attitutude_setpoint_read.roll_body;
+				attitude_setpoint.pitch_body = vehicle_attitutude_setpoint_read.pitch_body;
+				// attitude_setpoint.yaw_body = vehicle_attitutude_setpoint_read.yaw_body;
+				Quatf q_temp = Eulerf(attitude_setpoint.roll_body, attitude_setpoint.pitch_body, attitude_setpoint.yaw_body);
+				attitude_setpoint.q_d[0] = q_temp(0);
+				attitude_setpoint.q_d[1] = q_temp(1);
+				attitude_setpoint.q_d[2] = q_temp(2);
+				attitude_setpoint.q_d[3] = q_temp(3);
 			}
 			/*** END-CUSTOM ***/
 

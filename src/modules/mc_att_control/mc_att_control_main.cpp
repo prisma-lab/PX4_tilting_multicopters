@@ -126,8 +126,8 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	/*** CUSTOM ***/
 	float fx_sp = 0.0f;
 	float fy_sp = 0.0f;
-	float sin_yaw = 0.0f;
-	float cos_yaw = 0.0f;
+	// float sin_yaw = 0.0f;
+	// float cos_yaw = 0.0f;
 
 	//float pitch_des = 0.0f;
 	/*** END_CUSTOM ***/
@@ -146,13 +146,14 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 		/*** CUSTOM ***/
 		if(_param_airframe.get() == 11 && _param_tilting_type.get() == 1 ){
 			fx_sp = _manual_control_setpoint.x * _param_f_max.get();
-			fy_sp = -1.00f * _manual_control_setpoint.y * _param_f_max.get();
+			fy_sp = _manual_control_setpoint.y * _param_f_max.get();
 			// pitch_des = _manual_control_setpoint.aux1;
 			// PX4_INFO("aux1: %f ", (double)pitch_des)
 
 			// PX4_INFO("fx_sp: %f", (double)_manual_control_setpoint.x);
 			// PX4_INFO("fy_sp: %f", (double)_manual_control_setpoint.y);
 		}
+
 		/*** END-CUSTOM ***/
 	}
 
@@ -191,31 +192,24 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	/* This change is for the stabilized mode */
 
 	/* Check if the drone is a H-tilting multirotor */
-	if (_param_mpc_pitch_on_tilt.get()){
-		attitude_setpoint.pitch_body = 0.00f;
-		_tilt_servo_sp = euler_sp(1);
+	if (_param_airframe.get() == 11 && _param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
+
+		attitude_setpoint.pitch_body = 0.0f;
+		_tilt_servo_sp = euler_sp(1) - 0.0f;
+
+	}
+	else if(_param_airframe.get() == 11 && _param_tilting_type.get() == 1 ){
+
+		attitude_setpoint.pitch_body = 0.0f;
+		attitude_setpoint.roll_body = 0.0f;
+		attitude_setpoint.thrust_body[0] = fx_sp;
+		attitude_setpoint.thrust_body[1] = fy_sp;
+
 	}
 	else if(_param_airframe.get() != 11){
 
 		attitude_setpoint.pitch_body = euler_sp(1);
 		_tilt_servo_sp = 0.00f;
-	}
-	else if(_param_airframe.get() == 11 && _param_tilting_type.get() == 1 ){
-		attitude_setpoint.pitch_body = 0.00f;
-		attitude_setpoint.roll_body = 0.00f;
-		attitude_setpoint.thrust_body[0] = fx_sp;
-		attitude_setpoint.thrust_body[1] = fy_sp;
-
-		sin_yaw = sinf(yaw);
-		cos_yaw = cosf(yaw);
-
-		attitude_setpoint.thrust_body[0] = cos_yaw * fx_sp + sin_yaw * fy_sp;
-		attitude_setpoint.thrust_body[0] = math::constrain( attitude_setpoint.thrust_body[0],
-						   -1.0f*_param_f_max.get(), _param_f_max.get() );
-
-		attitude_setpoint.thrust_body[1] = -sin_yaw * fx_sp + cos_yaw * fy_sp;
-		attitude_setpoint.thrust_body[1] = math::constrain(attitude_setpoint.thrust_body[1],
-						   -1.0f*_param_f_max.get(), _param_f_max.get());
 	}
 
 	/*** END-CUSTOM ***/

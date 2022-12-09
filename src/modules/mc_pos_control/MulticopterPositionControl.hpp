@@ -106,6 +106,11 @@ private:
 	uORB::Subscription _vehicle_control_mode_sub {ORB_ID(vehicle_control_mode)};
 	uORB::Subscription _vehicle_land_detected_sub {ORB_ID(vehicle_land_detected)};
 
+	// /*** CUSTOM ***/
+	uORB::Subscription _vehicle_attitude_setpoint_sub{ORB_ID(vehicle_attitude_setpoint)};
+	// uORB::Subscription _tilting_mc_roll_pitch_setpoint_sub{ORB_ID(tilting_mc_roll_pitch_setpoint)};
+	// /*** END-CUSTOM ***/
+
 	hrt_abstime	_time_stamp_last_loop{0};		/**< time stamp of last loop iteration */
 
 	vehicle_local_position_setpoint_s _setpoint {};

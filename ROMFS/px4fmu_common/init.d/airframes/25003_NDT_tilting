@@ -31,7 +31,7 @@
 
 param set-default MAV_TYPE 14
 
-#param set-default SYS_CTRL_ALLOC 1 #dynamic allocation
+param set-default SYS_CTRL_ALLOC 1 #dynamic allocation
 param set-default CA_AIRFRAME 11 #Tilting Multirotor
 param set-default CA_TILTING_TYPE 1 #Omnidirectional tilting drone
 

@@ -28,7 +28,7 @@
 
 . ${R}etc/init.d/rc.mc_defaults
 
-#param set-default SYS_CTRL_ALLOC 1 #dynamic allocation
+param set-default SYS_CTRL_ALLOC 1 #dynamic allocation
 param set-default CA_AIRFRAME 11 #Tilting Multirotor
 param set-default CA_TILTING_TYPE 1 #Omnidirectional tilting drone
 
@@ -40,38 +40,46 @@ set PWM_AUX_OUT 1234
 param set-default CA_ROTOR_COUNT 8
 param set-default CA_SV_TL_COUNT 4
 
-param set-default CA_ROTOR0_PX 0.185 #M1 CCW
-param set-default CA_ROTOR0_PY 0.180
-param set-default CA_ROTOR0_PZ 0.0135
+#X-forward, Y-right
+#CW:-1, CCW:-1
+param set-default CA_ROTOR0_PX 0.35 #M1 CCW
+param set-default CA_ROTOR0_PY 0.35
+param set-default CA_ROTOR0_PZ 0.00
 param set-default CA_ROTOR0_KM 0.05
-param set-default CA_ROTOR1_PX 0.185 #M2 CW
-param set-default CA_ROTOR1_PY -0.180
-param set-default CA_ROTOR1_PZ 0.0135
+
+param set-default CA_ROTOR1_PX 0.35 #M2 CW
+param set-default CA_ROTOR1_PY -0.35
+param set-default CA_ROTOR1_PZ 0.00
 param set-default CA_ROTOR1_KM -0.05
-param set-default CA_ROTOR2_PX -0.185  #M3 CCW
-param set-default CA_ROTOR2_PY -0.180
-param set-default CA_ROTOR2_PZ 0.0135
+
+param set-default CA_ROTOR2_PX -0.35 #M3 CCW
+param set-default CA_ROTOR2_PY -0.35
+param set-default CA_ROTOR2_PZ 0.00
 param set-default CA_ROTOR2_KM 0.05
-param set-default CA_ROTOR3_PX -0.185 #M4 CW
-param set-default CA_ROTOR3_PY 0.180
-param set-default CA_ROTOR3_PZ 0.0135
+
+param set-default CA_ROTOR3_PX -0.35 #M4 CW
+param set-default CA_ROTOR3_PY 0.35
+param set-default CA_ROTOR3_PZ 0.00
 param set-default CA_ROTOR3_KM -0.05
 
-param set-default CA_ROTOR4_PX 0.185 #M5 CCW
-param set-default CA_ROTOR4_PY -0.180
-param set-default CA_ROTOR4_PZ -0.0685
+param set-default CA_ROTOR4_PX 0.35 #M5 CCW
+param set-default CA_ROTOR4_PY -0.35
+param set-default CA_ROTOR4_PZ 0.00
 param set-default CA_ROTOR4_KM 0.05
-param set-default CA_ROTOR5_PX 0.185 #M6 CW
-param set-default CA_ROTOR5_PY 0.180
-param set-default CA_ROTOR5_PZ -0.0685
+
+param set-default CA_ROTOR5_PX 0.35 #M6 CW
+param set-default CA_ROTOR5_PY 0.35
+param set-default CA_ROTOR5_PZ 0.00
 param set-default CA_ROTOR5_KM -0.05
-param set-default CA_ROTOR6_PX -0.185  #M7 CCW
-param set-default CA_ROTOR6_PY 0.180
-param set-default CA_ROTOR6_PZ -0.0685
+
+param set-default CA_ROTOR6_PX -0.35  #M7 CCW
+param set-default CA_ROTOR6_PY 0.35
+param set-default CA_ROTOR6_PZ 0.00
 param set-default CA_ROTOR6_KM 0.05
-param set-default CA_ROTOR7_PX -0.185 #M8 CW
-param set-default CA_ROTOR7_PY -0.180
-param set-default CA_ROTOR7_PZ -0.0685
+
+param set-default CA_ROTOR7_PX -0.35 #M8 CW
+param set-default CA_ROTOR7_PY -0.35
+param set-default CA_ROTOR7_PZ  0.00
 param set-default CA_ROTOR7_KM -0.05
 
 param set-default PWM_MAIN_FUNC1 101 #esc
@@ -88,13 +96,13 @@ param set-default PWM_MAIN_FUNC11 203
 param set-default PWM_MAIN_FUNC12 204
 
 # Limits for tilting angles
-param set-default CA_SV_TL0_MAXA 45
-param set-default CA_SV_TL0_MINA -45
-param set-default CA_SV_TL1_MAXA 45
-param set-default CA_SV_TL1_MINA -45
-param set-default CA_SV_TL2_MAXA 45
-param set-default CA_SV_TL2_MINA -45
-param set-default CA_SV_TL3_MAXA 45
-param set-default CA_SV_TL3_MINA -45
+param set-default CA_SV_TL0_MAXA 30
+param set-default CA_SV_TL0_MINA -30
+param set-default CA_SV_TL1_MAXA 30
+param set-default CA_SV_TL1_MINA -30
+param set-default CA_SV_TL2_MAXA 30
+param set-default CA_SV_TL2_MINA -30
+param set-default CA_SV_TL3_MAXA 30
+param set-default CA_SV_TL3_MINA -30
 
 

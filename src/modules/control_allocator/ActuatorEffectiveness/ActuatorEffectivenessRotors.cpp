@@ -192,10 +192,12 @@ ActuatorEffectivenessRotors::addActuators(Configuration &configuration)
 // int
 // ActuatorEffectivenessRotors::computeEffectivenessMatrix(const Geometry &geometry,
 // 		EffectivenessMatrix &effectiveness, int actuator_start_index)
+/*** CUSOTM ***/
 int
 ActuatorEffectivenessRotors::computeEffectivenessMatrix(const Geometry &geometry,
 		EffectivenessMatrix &effectiveness, int actuator_start_index,
 		bool tilting_omnidir, bool ver_lat)
+/*** END-CUSTOM ***/
 {
 	int num_actuators = 0;
 
