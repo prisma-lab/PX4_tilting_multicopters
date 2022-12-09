@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# @name Koala Tilting Octorotor-H-cox
+#
+# @type Tilting Multirotor
+# @class Copter
+#
+# @output MAIN1 motor 1
+# @output MAIN2 motor 2
+# @output MAIN3 motor 3
+# @output MAIN4 motor 4
+# @output MAIN5 motor 5
+# @output MAIN6 motor 6
+# @output MAIN6 motor 7
+# @output MAIN6 motor 8
+# @output MAIN6 motor 9
+# @output MAIN6 motor 10
+# @output MAIN6 motor 11
+# @output MAIN6 motor 12
+#
+# @output AUX1 motor 1
+# @output AUX2 motor 2
+# @output AUX3 motor 3
+# @output AUX4 motor 4
+#
+# @maintainer Salvatore Marcellini <salvatore.marcellini@gmail.com>
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+
+param set-default SYS_CTRL_ALLOC 1 #dynamic allocation
+param set-default CA_AIRFRAME 11 #Tilting Multirotor
+
+set MAV_TYPE 14
+
+set MIXER generic_tilting
+set MIXER_AUX generic_tilting
+
+# Set all 8 channels
+set PWM_OUT 12345678
+set PWM_AUX_OUT 1234

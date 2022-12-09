@@ -1,0 +1,92 @@
+#!/bin/sh
+#
+# @name Koala
+#
+# @type Tilting Multirotor
+# @class Copter
+#
+# @output MAIN1 motor 1
+# @output MAIN2 motor 2
+# @output MAIN3 motor 3
+# @output MAIN4 motor 4
+# @output MAIN5 motor 5
+# @output MAIN6 motor 6
+# @output MAIN6 motor 7
+# @output MAIN6 motor 8
+# @output MAIN6 motor 9
+# @output MAIN6 motor 10
+# @output MAIN6 motor 11
+# @output MAIN6 motor 12
+#
+# @output AUX1 motor 1
+# @output AUX2 motor 2
+# @output AUX3 motor 3
+# @output AUX4 motor 4
+#
+# @maintainer Alessandro De Crescenzo <ale-dc@live.it>
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+
+param set-default SYS_CTRL_ALLOC 1 #dynamic allocation
+param set-default CA_AIRFRAME 11 #Tilting Multirotor
+
+set MAV_TYPE 14
+
+#set MIXER generic_tilting_sitl
+#set MIXER_AUX generic_tilting_sitl
+#set MIXER_FILE etc/mixers-sitl/generic_tilting_sitl.aux.mix
+#set MIXER custom
+
+# Set all 8 channels
+#set PWM_OUT 12345678
+#set PWM_AUX_OUT 1234
+param set-default CA_ROTOR_COUNT 8
+param set-default CA_SV_TL_COUNT 2
+
+param set-default CA_ROTOR0_PX 0.230 #M1 CCW
+param set-default CA_ROTOR0_PY 0.415
+param set-default CA_ROTOR0_PZ 0.043
+param set-default CA_ROTOR0_KM 0.05
+param set-default CA_ROTOR1_PX 0.230 #M2 CW
+param set-default CA_ROTOR1_PY -0.415
+param set-default CA_ROTOR1_PZ 0.043
+param set-default CA_ROTOR1_KM -0.05
+param set-default CA_ROTOR2_PX -0.230  #M3 CCW
+param set-default CA_ROTOR2_PY -0.415
+param set-default CA_ROTOR2_PZ 0.043
+param set-default CA_ROTOR2_KM 0.05
+param set-default CA_ROTOR3_PX -0.230 #M4 CW
+param set-default CA_ROTOR3_PY 0.415
+param set-default CA_ROTOR3_PZ 0.043
+param set-default CA_ROTOR3_KM -0.05
+
+param set-default CA_ROTOR4_PX 0.230 #M5 CCW
+param set-default CA_ROTOR4_PY -0.415
+param set-default CA_ROTOR4_PZ -0.043
+param set-default CA_ROTOR4_KM 0.05
+param set-default CA_ROTOR5_PX 0.230 #M6 CW
+param set-default CA_ROTOR5_PY 0.415
+param set-default CA_ROTOR5_PZ -0.043
+param set-default CA_ROTOR5_KM -0.05
+param set-default CA_ROTOR6_PX -0.230  #M7 CCW
+param set-default CA_ROTOR6_PY 0.415
+param set-default CA_ROTOR6_PZ -0.043
+param set-default CA_ROTOR6_KM 0.05
+param set-default CA_ROTOR7_PX -0.230 #M8 CW
+param set-default CA_ROTOR7_PY -0.415
+param set-default CA_ROTOR7_PZ -0.043
+param set-default CA_ROTOR7_KM -0.05
+
+param set-default PWM_MAIN_FUNC1 101 #esc
+param set-default PWM_MAIN_FUNC2 102
+param set-default PWM_MAIN_FUNC3 103
+param set-default PWM_MAIN_FUNC4 104
+param set-default PWM_MAIN_FUNC5 105
+param set-default PWM_MAIN_FUNC6 106
+param set-default PWM_MAIN_FUNC7 107
+param set-default PWM_MAIN_FUNC8 108
+param set-default PWM_MAIN_FUNC9 201 #servo
+param set-default PWM_MAIN_FUNC10 202
+
+

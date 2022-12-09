@@ -79,4 +79,13 @@ px4_add_romfs_files(
 	6011_typhoon_h480.post
 	6012_typhoon_h480_ctrlalloc
 	6012_typhoon_h480_ctrlalloc.post
+
+	# CUSTOM Drones
+	25001_generic_tilting_multirotor
+	25002_koala_tilting_octo_H
+	25003_NDT_tilting
+	25004_baby_k
+	25005_baby_k_interaction
+	25006_koala
+	#######################
 )
