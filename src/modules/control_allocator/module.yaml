@@ -27,6 +27,9 @@ parameters:
                 7: Motors (6DOF)
                 8: Multirotor with Tilt
                 9: Custom
+                #*** CUSTOM
+                11: Tilting Multirotor
+                #*** END-CUSTOM
             default: 0
 
         CA_METHOD:
@@ -41,6 +44,20 @@ parameters:
                 1: Pseudo-inverse with sequential desaturation technique
                 2: Automatic
             default: 2
+
+        #*** CUSTOM ***
+        CA_TILTING_TYPE:
+            description:
+                short: Utilize one tilting angle or fully actuated tilting drone
+                long: |
+                  One tilting angle drones have only one more degree of freedom,
+                  while fully actuated drones have 6 degree of freedom.
+            type: enum
+            values:
+                0: One tilt degree
+                1: Fully actuated
+            default: 0
+        #*** END-CUSTOM ***
 
         # Motor parameters
         CA_R_REV:
@@ -369,6 +386,63 @@ parameters:
             num_instances: *max_num_tilts
             instance_start: 0
             default: 0
+
+        # *** CUSTOM ***
+        #Tilting Multirotor tilts
+        CA_SV_TM_COUNT:
+            description:
+                short: Total number of Tilt Servos
+            type: enum
+            values:
+                0: '0'
+                1: '1'
+                2: '2'
+                3: '3'
+                4: '4'
+            default: 0
+        CA_SV_TM${i}_MINA:
+            description:
+                short: Tilt Servo ${i} Tilt Angle at Minimum
+                long: |
+                  Defines the tilt angle when the servo is at the minimum.
+                  An angle of zero means upwards.
+            type: float
+            decimal: 0
+            unit: 'deg'
+            num_instances: *max_num_tilts
+            instance_start: 0
+            min: -90.0
+            max: 90.0
+            default: 0.0
+        CA_SV_TM${i}_MAXA:
+            description:
+                short: Tilt Servo ${i} Tilt Angle at Maximum
+                long: |
+                  Defines the tilt angle when the servo is at the maximum.
+                  An angle of zero means upwards.
+            type: float
+            decimal: 0
+            unit: 'deg'
+            num_instances: *max_num_tilts
+            instance_start: 0
+            min: -90.0
+            max: 90.0
+            default: 90.0
+        CA_SV_TM${i}_TD:
+            description:
+                short: Tilt Servo ${i} Tilt Direction
+                long: |
+                  Defines the direction the servo tilts towards when moving towards the maximum tilt angle.
+            type: enum
+            values:
+                0: 'Positive'
+                90: 'Negative'
+            min: 0
+            max: 359
+            num_instances: *max_num_tilts
+            instance_start: 0
+            default: 0
+        # *** END-CUSTOM ***
 
 
 # Mixer
@@ -759,3 +833,39 @@ mixer:
                           - name: 'CA_SV_CS${i}_TRIM'
                             label: 'Trim'
 
+            # *** CUSTOM ***
+            11: #Tilting Multirotor
+                title: 'Tilting Multirotor'
+                actuators:
+                  - actuator_type: 'motor'
+                    group_label: 'Rotors'
+                    count: 'CA_ROTOR_COUNT'
+                    item_label_prefix: 'Rotor ${i}'
+                    per_item_parameters:
+                      standard:
+                        position: [ 'CA_ROTOR${i}_PX', 'CA_ROTOR${i}_PY', 'CA_ROTOR${i}_PZ' ]
+                      extra:
+                        - name: 'CA_ROTOR${i}_CT'
+                          label: "Thrust\nCoefficient"
+                        - name: 'CA_ROTOR${i}_KM'
+                          label: 'Direction CCW'
+                          function: 'spin-dir'
+                          show_as: 'true-if-positive'
+                        - name: 'CA_ROTOR${i}_TILT'
+                          label: 'Tilted by'
+                  - actuator_type: 'servo'
+                    group_label: 'Tilt Servos'
+                    count: 'CA_SV_TL_COUNT'
+                    item_label_prefix: 'Tilt ${i}'
+                    parameters:
+                        - name: 'CA_TILTING_TYPE'
+                          label: 'Tilting drone type'
+                    per_item_parameters:
+                      extra:
+                        - name: 'CA_SV_TL${i}_MINA'
+                          label: "Angle at Min\nTilt"
+                        - name: 'CA_SV_TL${i}_MAXA'
+                          label: "Angle at Max\nTilt"
+                        - name: 'CA_SV_TL${i}_TD'
+                          label: 'Tilt Direction'
+            # *** END-CUSTOM ***

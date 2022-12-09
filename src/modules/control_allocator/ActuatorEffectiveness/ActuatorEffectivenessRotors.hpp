@@ -77,8 +77,14 @@ public:
 		bool propeller_torque_disabled_non_upwards{false}; ///< keeps propeller torque enabled for upward facing motors
 	};
 
+	// ActuatorEffectivenessRotors(ModuleParams *parent, AxisConfiguration axis_config = AxisConfiguration::Configurable,
+	// 			    bool tilt_support = false);
+
+	/*** CUSTOM ***/
 	ActuatorEffectivenessRotors(ModuleParams *parent, AxisConfiguration axis_config = AxisConfiguration::Configurable,
-				    bool tilt_support = false);
+				    bool tilt_support = false, bool tilting_omnidir = false);
+	/*** CUSOTM ***/
+
 	virtual ~ActuatorEffectivenessRotors() = default;
 
 	void getDesiredAllocationMethod(AllocationMethod allocation_method_out[MAX_NUM_MATRICES]) const override
@@ -91,8 +97,19 @@ public:
 		normalize[0] = true;
 	}
 
+	/*** CUSTOM ***/
+	/**
+	 * @param tilting_omnidir to check if is omnidirectional tilting
+	 * @param vet_lat to compute a vertical force or lateral force column
+	*/
 	static int computeEffectivenessMatrix(const Geometry &geometry,
-					      EffectivenessMatrix &effectiveness, int actuator_start_index = 0);
+					      EffectivenessMatrix &effectiveness, int actuator_start_index = 0,
+					      bool tilting_omnidir = false,
+					      bool vert_lat = false);
+	/*** END-CUSTOM ***/
+
+	// static int computeEffectivenessMatrix(const Geometry &geometry,
+	// 				      EffectivenessMatrix &effectiveness, int actuator_start_index = 0);
 
 	bool addActuators(Configuration &configuration);
 
@@ -124,6 +141,10 @@ private:
 	void updateParams() override;
 	const AxisConfiguration _axis_config;
 	const bool _tilt_support; ///< if true, tilt servo assignment params are loaded
+
+	/*** CUSTOM ***/
+	const bool _tilting_omnidir;
+	/*** END-CUSTOM ***/
 
 	struct ParamHandles {
 		param_t position_x;

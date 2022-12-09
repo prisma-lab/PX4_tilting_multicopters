@@ -172,7 +172,13 @@ private:
 		(ParamFloat<px4::params::MPC_MAN_Y_TAU>)    _param_mpc_man_y_tau,
 
 		(ParamFloat<px4::params::MPC_XY_VEL_ALL>)   _param_mpc_xy_vel_all,
-		(ParamFloat<px4::params::MPC_Z_VEL_ALL>)    _param_mpc_z_vel_all
+		(ParamFloat<px4::params::MPC_Z_VEL_ALL>)    _param_mpc_z_vel_all,
+
+		/*** CUSTOM ***/
+		(ParamInt<px4::params::CA_TILTING_TYPE>)    _param_tilting_type, /** < 0:h-tilting, 1:omnidirectional*/
+		(ParamFloat<px4::params::MC_MAX_FXY>)   _param_f_max
+
+		/*** END-CUSTOM ***/
 	);
 
 	control::BlockDerivative _vel_x_deriv; /**< velocity derivative in x */

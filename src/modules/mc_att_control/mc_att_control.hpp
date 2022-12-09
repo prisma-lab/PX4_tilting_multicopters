@@ -139,6 +139,12 @@ private:
 
 	uint8_t _quat_reset_counter{0};
 
+	/*** CUSTOM ***/
+
+	float _tilt_servo_sp{0.0f}; /**< desired angle for the tilt servo [rad] */
+
+	/*** END-CUSTOM ***/
+
 	DEFINE_PARAMETERS(
 		(ParamFloat<px4::params::MC_ROLL_P>) _param_mc_roll_p,
 		(ParamFloat<px4::params::MC_PITCH_P>) _param_mc_pitch_p,
@@ -160,7 +166,18 @@ private:
 		(ParamInt<px4::params::MPC_THR_CURVE>) _param_mpc_thr_curve,				/**< throttle curve behavior */
 
 		(ParamInt<px4::params::MC_AIRMODE>) _param_mc_airmode,
-		(ParamFloat<px4::params::MC_MAN_TILT_TAU>) _param_mc_man_tilt_tau
+		(ParamFloat<px4::params::MC_MAN_TILT_TAU>) _param_mc_man_tilt_tau,
+
+		/*** CUSTOM ***/
+
+		(ParamInt<px4::params::MC_PITCH_ON_TILT>)   _param_mpc_pitch_on_tilt,   /**< map the pitch angle on the tilt */
+		(ParamInt<px4::params::CA_TILTING_TYPE>)    _param_tilting_type,	/**< 0: H-tilt, 1: omnidirectional */
+		(ParamInt<px4::params::CA_AIRFRAME>)	    _param_airframe,		/**< 11: tilting multirotor */
+		(ParamFloat<px4::params::MC_MAX_FXY>)       _param_f_max,		/**< maximum horizontal force for omni drones*/
+		(ParamFloat<px4::params::MC_DES_PITCH_MAX>) _param_des_pitch_max,	/**< maximum desired pitch for tilting drones*/
+		(ParamFloat<px4::params::MC_DES_PITCH_MIN>) _param_des_pitch_min	/**< minimum desired pitch for tilting drones*/
+
+		/*** END-CUSTOM ***/
 	)
 };
 

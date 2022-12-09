@@ -123,6 +123,15 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	vehicle_attitude_setpoint_s attitude_setpoint{};
 	const float yaw = Eulerf(q).psi();
 
+	/*** CUSTOM ***/
+	float fx_sp = 0.0f;
+	float fy_sp = 0.0f;
+	float sin_yaw = 0.0f;
+	float cos_yaw = 0.0f;
+
+	//float pitch_des = 0.0f;
+	/*** END_CUSTOM ***/
+
 	/* reset yaw setpoint to current position if needed */
 	if (reset_yaw_sp) {
 		_man_yaw_sp = yaw;
@@ -133,6 +142,18 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 		const float yaw_rate = math::radians(_param_mpc_man_y_max.get());
 		attitude_setpoint.yaw_sp_move_rate = _manual_control_setpoint.r * yaw_rate;
 		_man_yaw_sp = wrap_pi(_man_yaw_sp + attitude_setpoint.yaw_sp_move_rate * dt);
+
+		/*** CUSTOM ***/
+		if(_param_airframe.get() == 11 && _param_tilting_type.get() == 1 ){
+			fx_sp = _manual_control_setpoint.x * _param_f_max.get();
+			fy_sp = -1.00f * _manual_control_setpoint.y * _param_f_max.get();
+			// pitch_des = _manual_control_setpoint.aux1;
+			// PX4_INFO("aux1: %f ", (double)pitch_des)
+
+			// PX4_INFO("fx_sp: %f", (double)_manual_control_setpoint.x);
+			// PX4_INFO("fy_sp: %f", (double)_manual_control_setpoint.y);
+		}
+		/*** END-CUSTOM ***/
 	}
 
 	/*
@@ -163,7 +184,42 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	Quatf q_sp_rpy = AxisAnglef(v(0), v(1), 0.f);
 	Eulerf euler_sp = q_sp_rpy;
 	attitude_setpoint.roll_body = euler_sp(0);
-	attitude_setpoint.pitch_body = euler_sp(1);
+	// attitude_setpoint.pitch_body = euler_sp(1);
+
+	/*** CUSTOM ***/
+
+	/* This change is for the stabilized mode */
+
+	/* Check if the drone is a H-tilting multirotor */
+	if (_param_mpc_pitch_on_tilt.get()){
+		attitude_setpoint.pitch_body = 0.00f;
+		_tilt_servo_sp = euler_sp(1);
+	}
+	else if(_param_airframe.get() != 11){
+
+		attitude_setpoint.pitch_body = euler_sp(1);
+		_tilt_servo_sp = 0.00f;
+	}
+	else if(_param_airframe.get() == 11 && _param_tilting_type.get() == 1 ){
+		attitude_setpoint.pitch_body = 0.00f;
+		attitude_setpoint.roll_body = 0.00f;
+		attitude_setpoint.thrust_body[0] = fx_sp;
+		attitude_setpoint.thrust_body[1] = fy_sp;
+
+		sin_yaw = sinf(yaw);
+		cos_yaw = cosf(yaw);
+
+		attitude_setpoint.thrust_body[0] = cos_yaw * fx_sp + sin_yaw * fy_sp;
+		attitude_setpoint.thrust_body[0] = math::constrain( attitude_setpoint.thrust_body[0],
+						   -1.0f*_param_f_max.get(), _param_f_max.get() );
+
+		attitude_setpoint.thrust_body[1] = -sin_yaw * fx_sp + cos_yaw * fy_sp;
+		attitude_setpoint.thrust_body[1] = math::constrain(attitude_setpoint.thrust_body[1],
+						   -1.0f*_param_f_max.get(), _param_f_max.get());
+	}
+
+	/*** END-CUSTOM ***/
+
 	// The axis angle can change the yaw as well (noticeable at higher tilt angles).
 	// This is the formula by how much the yaw changes:
 	//   let a := tilt angle, b := atan(y/x) (direction of maximum tilt)
@@ -261,6 +317,39 @@ MulticopterAttitudeControl::Run()
 			if (_vehicle_attitude_setpoint_sub.copy(&vehicle_attitude_setpoint)
 			    && (vehicle_attitude_setpoint.timestamp > _last_attitude_setpoint)) {
 
+				/*** CUSTOM ***/
+
+				/* This change is for the position flight mode */
+
+				if (!_param_tilting_type.get() && _param_mpc_pitch_on_tilt.get()){
+					_tilt_servo_sp = vehicle_attitude_setpoint.pitch_body;
+
+					vehicle_attitude_setpoint.pitch_body = 0.00f;
+
+					Quatf q_temp = Eulerf(vehicle_attitude_setpoint.roll_body, vehicle_attitude_setpoint.pitch_body, vehicle_attitude_setpoint.yaw_body);
+					vehicle_attitude_setpoint.q_d[0] = q_temp(0);
+					vehicle_attitude_setpoint.q_d[1] = q_temp(1);
+					vehicle_attitude_setpoint.q_d[2] = q_temp(2);
+					vehicle_attitude_setpoint.q_d[3] = q_temp(3);
+				}
+				else if(_param_tilting_type.get()){
+
+					vehicle_attitude_setpoint.pitch_body = 0.00f;
+					vehicle_attitude_setpoint.roll_body = 0.00f;
+					_tilt_servo_sp = 0.00f;
+
+					Quatf q_temp = Eulerf(vehicle_attitude_setpoint.roll_body, vehicle_attitude_setpoint.pitch_body, vehicle_attitude_setpoint.yaw_body);
+					vehicle_attitude_setpoint.q_d[0] = q_temp(0);
+					vehicle_attitude_setpoint.q_d[1] = q_temp(1);
+					vehicle_attitude_setpoint.q_d[2] = q_temp(2);
+					vehicle_attitude_setpoint.q_d[3] = q_temp(3);
+				}
+				else{
+					_tilt_servo_sp = 0.00f;
+				}
+
+				/*** END-CUSTOM ***/
+
 				_attitude_control.setAttitudeSetpoint(Quatf(vehicle_attitude_setpoint.q_d), vehicle_attitude_setpoint.yaw_sp_move_rate);
 				_thrust_setpoint_body = Vector3f(vehicle_attitude_setpoint.thrust_body);
 				_last_attitude_setpoint = vehicle_attitude_setpoint.timestamp;
@@ -351,6 +440,12 @@ MulticopterAttitudeControl::Run()
 			v_rates_sp.yaw = rates_sp(2);
 			_thrust_setpoint_body.copyTo(v_rates_sp.thrust_body);
 			v_rates_sp.timestamp = hrt_absolute_time();
+
+			/*** CUSTOM ***/
+			// PX4_INFO("Tilt_sp: %f \n", (double)_tilt_servo_sp);
+			v_rates_sp.tilt_servo = _tilt_servo_sp;
+
+			/*** END-CUSTOM ***/
 
 			_v_rates_sp_pub.publish(v_rates_sp);
 		}

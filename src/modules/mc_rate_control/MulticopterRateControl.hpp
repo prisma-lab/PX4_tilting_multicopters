@@ -143,6 +143,10 @@ private:
 	float _energy_integration_time{0.0f};
 	float _control_energy[4] {};
 
+	/*** CUSTOM ***/
+	float _tilting_angle_sp{0.0f}; /**< [rad] angle setpoint for tilting servo motors */
+	/*** END-CUSOTM ***/
+
 	DEFINE_PARAMETERS(
 		(ParamFloat<px4::params::MC_ROLLRATE_P>) _param_mc_rollrate_p,
 		(ParamFloat<px4::params::MC_ROLLRATE_I>) _param_mc_rollrate_i,
@@ -177,7 +181,12 @@ private:
 
 		(ParamBool<px4::params::MC_BAT_SCALE_EN>) _param_mc_bat_scale_en,
 
-		(ParamInt<px4::params::CBRK_RATE_CTRL>) _param_cbrk_rate_ctrl
+		(ParamInt<px4::params::CBRK_RATE_CTRL>) _param_cbrk_rate_ctrl,
+
+		/*** CUSTOM ***/
+		(ParamFloat<px4::params::CA_SV_TL0_MINA>) _param_tilt_min_angle,
+		(ParamFloat<px4::params::CA_SV_TL0_MAXA>) _param_tilt_max_angle
+		/*** END-CUSTOM ***/
 	)
 
 	matrix::Vector3f _acro_rate_max;	/**< max attitude rates in acro mode */

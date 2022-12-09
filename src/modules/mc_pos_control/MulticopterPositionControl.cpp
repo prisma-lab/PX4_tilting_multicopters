@@ -304,6 +304,11 @@ void MulticopterPositionControl::Run()
 		return;
 	}
 
+	/*** CUSTOM ***/
+	float sin_yaw, cos_yaw;
+
+	/*** END-CUSTOM ***/
+
 	// reschedule backup
 	ScheduleDelayed(100_ms);
 
@@ -505,6 +510,22 @@ void MulticopterPositionControl::Run()
 			// Publish attitude setpoint output
 			vehicle_attitude_setpoint_s attitude_setpoint{};
 			_control.getAttitudeSetpoint(attitude_setpoint);
+
+			/*** CUSTOM ***/
+			if( _param_tilting_type.get() == 1){
+				sin_yaw = sinf(attitude_setpoint.yaw_body);
+				cos_yaw = cosf(attitude_setpoint.yaw_body);
+
+				attitude_setpoint.thrust_body[0] = cos_yaw * local_pos_sp.thrust[0] + sin_yaw * local_pos_sp.thrust[1];
+				attitude_setpoint.thrust_body[0] = math::constrain(attitude_setpoint.thrust_body[0],
+							-1.0f*_param_f_max.get(), _param_f_max.get());
+
+				attitude_setpoint.thrust_body[1] = -sin_yaw * local_pos_sp.thrust[0] + cos_yaw * local_pos_sp.thrust[1];
+				attitude_setpoint.thrust_body[1] = math::constrain(attitude_setpoint.thrust_body[1],
+							-1.0f*_param_f_max.get(), _param_f_max.get());
+			}
+			/*** END-CUSTOM ***/
+
 			attitude_setpoint.timestamp = hrt_absolute_time();
 			_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
 

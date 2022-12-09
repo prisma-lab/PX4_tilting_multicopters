@@ -205,6 +205,11 @@ MulticopterRateControl::Run()
 				_rates_sp(1) = PX4_ISFINITE(v_rates_sp.pitch) ? v_rates_sp.pitch : rates(1);
 				_rates_sp(2) = PX4_ISFINITE(v_rates_sp.yaw)   ? v_rates_sp.yaw   : rates(2);
 				_thrust_sp = -v_rates_sp.thrust_body[2];
+
+				/*** CUSTOM ***/
+				// PX4_INFO("tilt_sp: %f \n", (double)vehicle_rates_setpoint.tilt_servo);
+				_tilting_angle_sp = v_rates_sp.tilt_servo;
+				/*** END-CUSTOM ***/
 			}
 		}
 
@@ -254,6 +259,11 @@ MulticopterRateControl::Run()
 			actuators.control[actuator_controls_s::INDEX_YAW] = PX4_ISFINITE(att_control(2)) ? att_control(2) : 0.0f;
 			actuators.control[actuator_controls_s::INDEX_THROTTLE] = PX4_ISFINITE(_thrust_sp) ? _thrust_sp : 0.0f;
 			actuators.control[actuator_controls_s::INDEX_LANDING_GEAR] = _landing_gear;
+
+			/*** CUSTOM ***/
+			actuators.control[actuator_controls_s::INDEX_FLAPS] = PX4_ISFINITE(_tilting_angle_sp) ? _tilting_angle_sp : 0.0f;
+			/*** END-CUSTOM ***/
+
 			actuators.timestamp_sample = angular_velocity.timestamp_sample;
 
 			if (!_vehicle_status.is_vtol) {
