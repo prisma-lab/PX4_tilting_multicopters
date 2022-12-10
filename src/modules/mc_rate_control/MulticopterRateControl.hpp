@@ -134,7 +134,9 @@ private:
 
 	matrix::Vector3f _rates_sp;			/**< angular rates setpoint */
 
+
 	float		_thrust_sp{0.0f};		/**< thrust setpoint */
+
 
 	hrt_abstime _last_run{0};
 
@@ -145,6 +147,7 @@ private:
 
 	/*** CUSTOM ***/
 	float _tilting_angle_sp{0.0f}; /**< [rad] angle setpoint for tilting servo motors */
+	matrix::Vector3f _thrust_setpoint{};
 	/*** END-CUSOTM ***/
 
 	DEFINE_PARAMETERS(

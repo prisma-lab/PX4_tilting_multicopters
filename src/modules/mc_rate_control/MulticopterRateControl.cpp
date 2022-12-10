@@ -206,9 +206,11 @@ MulticopterRateControl::Run()
 				_rates_sp(2) = PX4_ISFINITE(v_rates_sp.yaw)   ? v_rates_sp.yaw   : rates(2);
 				_thrust_sp = -v_rates_sp.thrust_body[2];
 
+
 				/*** CUSTOM ***/
 				// PX4_INFO("tilt_sp: %f \n", (double)vehicle_rates_setpoint.tilt_servo);
 				_tilting_angle_sp = v_rates_sp.tilt_servo;
+				_thrust_setpoint = Vector3f(v_rates_sp.thrust_body);
 				/*** END-CUSTOM ***/
 			}
 		}
@@ -323,8 +325,11 @@ void MulticopterRateControl::publishThrustSetpoint(const hrt_abstime &timestamp_
 	vehicle_thrust_setpoint_s v_thrust_sp = {};
 	v_thrust_sp.timestamp = hrt_absolute_time();
 	v_thrust_sp.timestamp_sample = timestamp_sample;
-	v_thrust_sp.xyz[0] = 0.0f;
-	v_thrust_sp.xyz[1] = 0.0f;
+	// v_thrust_sp.xyz[0] = 0.0f;
+	// v_thrust_sp.xyz[1] = 0.0f;
+	/*** CUSTOM ***/
+	_thrust_setpoint.copyTo(v_thrust_sp.xyz);
+	/*** END-CUSTOM ***/
 	v_thrust_sp.xyz[2] = PX4_ISFINITE(_thrust_sp) ? -_thrust_sp : 0.0f; // Z is Down
 
 	_vehicle_thrust_setpoint_pub.publish(v_thrust_sp);
