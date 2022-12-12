@@ -127,6 +127,12 @@ private:
 	AlphaFilter<float> _man_x_input_filter;
 	AlphaFilter<float> _man_y_input_filter;
 
+	/*** CUSOTM ***/
+	AlphaFilter<float> _man_Fx_input_filter;
+	AlphaFilter<float> _man_Fy_input_filter;
+	float _man_F_max;
+	/*** END-CUSTOM ***/
+
 	hrt_abstime _last_run{0};
 	hrt_abstime _last_attitude_setpoint{0};
 

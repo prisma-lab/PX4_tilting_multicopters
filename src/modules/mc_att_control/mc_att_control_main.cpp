@@ -98,6 +98,10 @@ MulticopterAttitudeControl::parameters_updated()
 						radians(_param_mc_yawrate_max.get())));
 
 	_man_tilt_max = math::radians(_param_mpc_man_tilt_max.get());
+
+	/*** CUSTOM ***/
+	_man_F_max = _param_f_max.get();
+	/*** END-CUSTOM ***/
 }
 
 float
@@ -123,15 +127,6 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	vehicle_attitude_setpoint_s attitude_setpoint{};
 	const float yaw = Eulerf(q).psi();
 
-	/*** CUSTOM ***/
-	float fx_sp = 0.0f;
-	float fy_sp = 0.0f;
-	// float sin_yaw = 0.0f;
-	// float cos_yaw = 0.0f;
-
-	//float pitch_des = 0.0f;
-	/*** END_CUSTOM ***/
-
 	/* reset yaw setpoint to current position if needed */
 	if (reset_yaw_sp) {
 		_man_yaw_sp = yaw;
@@ -143,18 +138,6 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 		attitude_setpoint.yaw_sp_move_rate = _manual_control_setpoint.r * yaw_rate;
 		_man_yaw_sp = wrap_pi(_man_yaw_sp + attitude_setpoint.yaw_sp_move_rate * dt);
 
-		/*** CUSTOM ***/
-		if(_param_airframe.get() == 11 && _param_tilting_type.get() == 1 ){
-			fx_sp = _manual_control_setpoint.x * _param_f_max.get();
-			fy_sp = _manual_control_setpoint.y * _param_f_max.get();
-			// pitch_des = _manual_control_setpoint.aux1;
-			// PX4_INFO("aux1: %f ", (double)pitch_des)
-
-			// PX4_INFO("fx_sp: %f", (double)_manual_control_setpoint.x);
-			// PX4_INFO("fy_sp: %f", (double)_manual_control_setpoint.y);
-		}
-
-		/*** END-CUSTOM ***/
 	}
 
 	/*
@@ -185,30 +168,52 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	Quatf q_sp_rpy = AxisAnglef(v(0), v(1), 0.f);
 	Eulerf euler_sp = q_sp_rpy;
 	attitude_setpoint.roll_body = euler_sp(0);
-	// attitude_setpoint.pitch_body = euler_sp(1);
+	attitude_setpoint.pitch_body = euler_sp(1);
 
 	/*** CUSTOM ***/
 
 	/* This change is for the stabilized mode */
 
-	/* Check if the drone is a H-tilting multirotor */
-	if (_param_airframe.get() == 11 && _param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
+	/*** CUSTOM ***/
+	/*
+	 * Input mapping for X and Y forces manual setpoints
+	 * ----------------------------------------
+	 * This allows a simple limitation of the force, the vehicle flies towards the direction that the stick
+	 * points to, and changes of the stick input are linear.
+	 */
+	if(_param_airframe.get() == 11 ){ //If tilting_multirotors
 
-		attitude_setpoint.pitch_body = 0.0f;
-		_tilt_servo_sp = euler_sp(1) - 0.0f;
+		//To do: change the time_constant of the filter from 0.0f to a param
+		_man_Fx_input_filter.setParameters(dt, 0.0f);
+		_man_Fy_input_filter.setParameters(dt, 0.0f);
+		_man_Fx_input_filter.update(_manual_control_setpoint.x * _man_F_max);
+		_man_Fy_input_filter.update(_manual_control_setpoint.y * _man_F_max);
+		const float fx_sp = _man_Fx_input_filter.getState();
+		const float fy_sp = _man_Fy_input_filter.getState();
+		// pitch_des = _manual_control_setpoint.aux1;
+		// PX4_INFO("aux1: %f ", (double)pitch_des)
 
+		// PX4_INFO("fx_sp: %f", (double)_manual_control_setpoint.x);
+		// PX4_INFO("fy_sp: %f", (double)_manual_control_setpoint.y);
+
+		/* Check if the drone is a H-tilting multirotor */
+		if (_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
+
+			attitude_setpoint.pitch_body = 0.0f;
+			_tilt_servo_sp = euler_sp(1) - 0.0f;
+
+		}
+		else if(_param_tilting_type.get() == 1 ){
+
+			attitude_setpoint.pitch_body = 0.0f;
+			attitude_setpoint.roll_body = 0.0f;
+			attitude_setpoint.thrust_body[0] = fx_sp;
+			attitude_setpoint.thrust_body[1] = fy_sp;
+
+		}
 	}
-	else if(_param_airframe.get() == 11 && _param_tilting_type.get() == 1 ){
+	else{
 
-		attitude_setpoint.pitch_body = 0.0f;
-		attitude_setpoint.roll_body = 0.0f;
-		attitude_setpoint.thrust_body[0] = fx_sp;
-		attitude_setpoint.thrust_body[1] = fy_sp;
-
-	}
-	else if(_param_airframe.get() != 11){
-
-		attitude_setpoint.pitch_body = euler_sp(1);
 		_tilt_servo_sp = 0.00f;
 	}
 
