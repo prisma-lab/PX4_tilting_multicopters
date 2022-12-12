@@ -204,4 +204,26 @@ PARAM_DEFINE_FLOAT(MC_DES_PITCH_MAX, 10.0f);
 */
 PARAM_DEFINE_FLOAT(MC_DES_PITCH_MIN, -10.0f);
 
+/**
+ * Maximum desired roll for tilting drone
+ *
+ * @unit deg
+ * @min 0.0
+ * @max 20.0
+ * @decimal 1
+ * @group Multicopter Attitude Control
+*/
+PARAM_DEFINE_FLOAT(MC_DES_ROLL_MAX, 10.0f);
+
+/**
+ * Minimum desired roll for tilting drone
+ *
+ * @unit deg
+ * @min -20.0
+ * @max 0.0
+ * @decimal 1
+ * @group Multicopter Attitude Control
+*/
+PARAM_DEFINE_FLOAT(MC_DES_ROLL_MIN, -10.0f);
+
 // *** END-CUSTOM ***

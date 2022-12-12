@@ -57,6 +57,10 @@
 #include <vtol_att_control/vtol_type.h>
 #include <lib/mathlib/math/filter/AlphaFilter.hpp>
 
+/*** CUSTOM ***/
+#include <uORB/topics/tilting_mc_desired_angles.h>
+/*** END-CUSTOM ***/
+
 #include <AttitudeControl.hpp>
 
 using namespace time_literals;
@@ -140,8 +144,15 @@ private:
 	uint8_t _quat_reset_counter{0};
 
 	/*** CUSTOM ***/
+	uORB::Subscription _tilting_mc_angles_sub{ORB_ID(tilting_mc_desired_angles)};
 
+	AlphaFilter<float> _man_Fx_input_filter;
+	AlphaFilter<float> _man_Fy_input_filter;
+	float _man_F_max;
 	float _tilt_servo_sp{0.0f}; /**< desired angle for the tilt servo [rad] */
+	float _tilting_mc_roll_sp{0.0f};
+	float _tilting_mc_pitch_sp{0.0f};
+	hrt_abstime _last_angles_setpoint{0};
 
 	/*** END-CUSTOM ***/
 
@@ -175,7 +186,9 @@ private:
 		(ParamInt<px4::params::CA_AIRFRAME>)	    _param_airframe,		/**< 11: tilting multirotor */
 		(ParamFloat<px4::params::MC_MAX_FXY>)       _param_f_max,		/**< maximum horizontal force for omni drones*/
 		(ParamFloat<px4::params::MC_DES_PITCH_MAX>) _param_des_pitch_max,	/**< maximum desired pitch for tilting drones*/
-		(ParamFloat<px4::params::MC_DES_PITCH_MIN>) _param_des_pitch_min	/**< minimum desired pitch for tilting drones*/
+		(ParamFloat<px4::params::MC_DES_PITCH_MIN>) _param_des_pitch_min,	/**< minimum desired pitch for tilting drones*/
+		(ParamFloat<px4::params::MC_DES_ROLL_MAX>)  _param_des_roll_max,		/**< maximum desired roll for tilting drones*/
+		(ParamFloat<px4::params::MC_DES_ROLL_MIN>)  _param_des_roll_min		/**< minimum desired roll for tilting drones*/
 
 		/*** END-CUSTOM ***/
 	)
