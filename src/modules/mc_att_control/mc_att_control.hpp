@@ -57,6 +57,10 @@
 #include <vtol_att_control/vtol_type.h>
 #include <lib/mathlib/math/filter/AlphaFilter.hpp>
 
+/*** CUSTOM ***/
+#include <uORB/topics/tilting_mc_desired_angles.h>
+/*** END-CUSTOM ***/
+
 #include <AttitudeControl.hpp>
 
 using namespace time_literals;
@@ -127,12 +131,6 @@ private:
 	AlphaFilter<float> _man_x_input_filter;
 	AlphaFilter<float> _man_y_input_filter;
 
-	/*** CUSOTM ***/
-	AlphaFilter<float> _man_Fx_input_filter;
-	AlphaFilter<float> _man_Fy_input_filter;
-	float _man_F_max;
-	/*** END-CUSTOM ***/
-
 	hrt_abstime _last_run{0};
 	hrt_abstime _last_attitude_setpoint{0};
 
@@ -146,8 +144,13 @@ private:
 	uint8_t _quat_reset_counter{0};
 
 	/*** CUSTOM ***/
+	uORB::Subscription _tilting_mc_angles_sub{ORB_ID(tilting_mc_desired_angles)};
 
+	AlphaFilter<float> _man_Fx_input_filter;
+	AlphaFilter<float> _man_Fy_input_filter;
+	float _man_F_max;
 	float _tilt_servo_sp{0.0f}; /**< desired angle for the tilt servo [rad] */
+	hrt_abstime _last_angles_setpoint{0};
 
 	/*** END-CUSTOM ***/
 

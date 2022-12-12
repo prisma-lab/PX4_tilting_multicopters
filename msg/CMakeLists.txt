@@ -205,6 +205,10 @@ set(msg_files
 	wheel_encoders.msg
 	wind.msg
 	yaw_estimator_status.msg
+
+	#*** CUSTOM
+	tilting_mc_desired_angles.msg
+	#*** END-CUSTOM
 )
 
 if(NOT px4_constrained_flash_build)
