@@ -322,6 +322,7 @@ MulticopterAttitudeControl::Run()
 				if(_param_airframe.get() == 11 ){ //If tilting_multirotors
 
 					if(_tilting_mc_angles_sub.updated()){
+
 						tilting_mc_desired_angles_s tilting_mc_angles_sp;
 
 						if (_tilting_mc_angles_sub.copy(&tilting_mc_angles_sp) &&
@@ -330,31 +331,38 @@ MulticopterAttitudeControl::Run()
 							// H-tilting multirotor
 							if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
 
-								_tilt_servo_sp = vehicle_attitude_setpoint.pitch_body;
-								vehicle_attitude_setpoint.pitch_body = tilting_mc_angles_sp.pitch_body;
+								_tilting_mc_pitch_sp = tilting_mc_angles_sp.pitch_body;
 							}
 							else if(_param_tilting_type.get() == 1){
 
-								vehicle_attitude_setpoint.pitch_body = tilting_mc_angles_sp.pitch_body;
-								vehicle_attitude_setpoint.roll_body = tilting_mc_angles_sp.roll_body;
+								_tilting_mc_pitch_sp = tilting_mc_angles_sp.pitch_body;
+								_tilting_mc_roll_sp = tilting_mc_angles_sp.roll_body;
 								_tilt_servo_sp = 0.00f;
 
 							}
-
-							Quatf q_temp = Eulerf(vehicle_attitude_setpoint.roll_body, vehicle_attitude_setpoint.pitch_body, vehicle_attitude_setpoint.yaw_body);
-							vehicle_attitude_setpoint.q_d[0] = q_temp(0);
-							vehicle_attitude_setpoint.q_d[1] = q_temp(1);
-							vehicle_attitude_setpoint.q_d[2] = q_temp(2);
-							vehicle_attitude_setpoint.q_d[3] = q_temp(3);
 
 							_last_angles_setpoint = tilting_mc_angles_sp.timestamp;
 						}
 
 					}
 
+					/* For the H-tilting multirotor the tilt_servo angle must always be updated */
+					if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
+						_tilt_servo_sp = vehicle_attitude_setpoint.pitch_body - _tilting_mc_pitch_sp;
+						_tilting_mc_roll_sp = vehicle_attitude_setpoint.roll_body;
+					}
+
+					Quatf q_temp = Eulerf(_tilting_mc_roll_sp, _tilting_mc_pitch_sp, vehicle_attitude_setpoint.yaw_body);
+					vehicle_attitude_setpoint.q_d[0] = q_temp(0);
+					vehicle_attitude_setpoint.q_d[1] = q_temp(1);
+					vehicle_attitude_setpoint.q_d[2] = q_temp(2);
+					vehicle_attitude_setpoint.q_d[3] = q_temp(3);
+
 				}
 				else{
 					_tilt_servo_sp = 0.00f;
+					_tilting_mc_pitch_sp = 0.00f;
+					_tilting_mc_roll_sp = 0.00f;
 				}
 
 				/*** END-CUSTOM ***/
