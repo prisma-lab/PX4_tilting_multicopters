@@ -331,12 +331,18 @@ MulticopterAttitudeControl::Run()
 							// H-tilting multirotor
 							if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
 
-								_tilting_mc_pitch_sp = tilting_mc_angles_sp.pitch_body;
+								_tilting_mc_pitch_sp = math::constrain(tilting_mc_angles_sp.pitch_body,
+									_param_des_pitch_min.get(), _param_des_pitch_max.get());
+
 							}
 							else if(_param_tilting_type.get() == 1){
 
-								_tilting_mc_pitch_sp = tilting_mc_angles_sp.pitch_body;
-								_tilting_mc_roll_sp = tilting_mc_angles_sp.roll_body;
+								_tilting_mc_pitch_sp = math::constrain(tilting_mc_angles_sp.pitch_body,
+									_param_des_pitch_min.get(), _param_des_pitch_max.get());
+
+								_tilting_mc_roll_sp = math::constrain(tilting_mc_angles_sp.roll_body,
+									_param_des_roll_min.get(), _param_des_roll_max.get());
+
 								_tilt_servo_sp = 0.00f;
 
 							}

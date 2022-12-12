@@ -186,7 +186,9 @@ private:
 		(ParamInt<px4::params::CA_AIRFRAME>)	    _param_airframe,		/**< 11: tilting multirotor */
 		(ParamFloat<px4::params::MC_MAX_FXY>)       _param_f_max,		/**< maximum horizontal force for omni drones*/
 		(ParamFloat<px4::params::MC_DES_PITCH_MAX>) _param_des_pitch_max,	/**< maximum desired pitch for tilting drones*/
-		(ParamFloat<px4::params::MC_DES_PITCH_MIN>) _param_des_pitch_min	/**< minimum desired pitch for tilting drones*/
+		(ParamFloat<px4::params::MC_DES_PITCH_MIN>) _param_des_pitch_min,	/**< minimum desired pitch for tilting drones*/
+		(ParamFloat<px4::params::MC_DES_ROLL_MAX>)  _param_des_roll_max,		/**< maximum desired roll for tilting drones*/
+		(ParamFloat<px4::params::MC_DES_ROLL_MIN>)  _param_des_roll_min		/**< minimum desired roll for tilting drones*/
 
 		/*** END-CUSTOM ***/
 	)
