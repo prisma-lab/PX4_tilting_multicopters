@@ -200,7 +200,6 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 		if (_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
 
 			attitude_setpoint.pitch_body = 0.0f;
-			_tilt_servo_sp = euler_sp(1) - 0.0f;
 
 		}
 		else if(_param_tilting_type.get() == 1 ){
@@ -211,10 +210,6 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 			attitude_setpoint.thrust_body[1] = fy_sp;
 
 		}
-	}
-	else{
-
-		_tilt_servo_sp = 0.00f;
 	}
 
 	/*** END-CUSTOM ***/
@@ -406,13 +401,6 @@ MulticopterAttitudeControl::Run()
 			v_rates_sp.yaw = rates_sp(2);
 			_thrust_setpoint_body.copyTo(v_rates_sp.thrust_body);
 			v_rates_sp.timestamp = hrt_absolute_time();
-
-			/*** CUSTOM ***/
-			// PX4_INFO("Tilt_sp: %f \n", (double)_tilt_servo_sp);
-			v_rates_sp.tilt_servo = _tilt_servo_sp;
-
-			/*** END-CUSTOM ***/
-
 			_v_rates_sp_pub.publish(v_rates_sp);
 		}
 

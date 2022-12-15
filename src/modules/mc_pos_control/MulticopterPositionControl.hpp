@@ -67,6 +67,7 @@
 
 /*** CUSTOM ***/
 #include <uORB/topics/tilting_mc_desired_angles.h>
+#include <uORB/topics/tilting_servo_sp.h>
 /*** END-CUSTOM ***/
 
 using namespace time_literals;
@@ -112,8 +113,10 @@ private:
 
 	// /*** CUSTOM ***/
 	uORB::Subscription _tilting_mc_angles_sub {ORB_ID(tilting_mc_desired_angles)};
+	uORB::Publication<tilting_servo_sp_s> _tilting_servo_setpoint_pub {ORB_ID(tilting_servo_setpoint)};
 	float _tilting_mc_roll_sp{0.0f};
 	float _tilting_mc_pitch_sp{0.0f};
+	tilting_servo_sp_s _tilting_servo_sp {};
 	hrt_abstime _last_angles_setpoint{0};
 	// /*** END-CUSTOM ***/
 

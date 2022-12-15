@@ -55,6 +55,10 @@ MulticopterPositionControl::MulticopterPositionControl(bool vtol) :
 	_tilt_limit_slew_rate.setSlewRate(.2f);
 	reset_setpoint_to_nan(_setpoint);
 	_takeoff_status_pub.advertise();
+
+	/*** CUSTOM ***/
+	_tilting_servo_setpoint_pub.advertise();
+	/*** END-CUSTOM ***/
 }
 
 MulticopterPositionControl::~MulticopterPositionControl()
@@ -551,16 +555,20 @@ void MulticopterPositionControl::Run()
 						_last_angles_setpoint = tilting_mc_angles_sp.timestamp;
 					}
 
-					// /* For the H-tilting multirotor the tilt_servo angle must always be updated */
-					// if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
-					// 	_tilt_servo_sp = vehicle_attitude_setpoint.pitch_body - _tilting_mc_pitch_sp;
-					// 	_tilting_mc_roll_sp = vehicle_attitude_setpoint.roll_body;
-					// }
+				}
 
+				/* For the H-tilting multirotor the tilt_servo angle must always be updated */
+				if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
+
+					_tilting_servo_sp.angle[0] = attitude_setpoint.pitch_body - _tilting_mc_pitch_sp;
+					_tilting_mc_roll_sp = attitude_setpoint.roll_body;
+
+					_tilting_servo_setpoint_pub.publish(_tilting_servo_sp);
 				}
 
 				attitude_setpoint.roll_body = _tilting_mc_roll_sp;
 				attitude_setpoint.pitch_body = _tilting_mc_pitch_sp;
+
 			}
 			/*** END-CUSTOM ***/
 

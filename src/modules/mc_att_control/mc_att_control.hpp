@@ -148,7 +148,6 @@ private:
 	AlphaFilter<float> _man_Fx_input_filter;
 	AlphaFilter<float> _man_Fy_input_filter;
 	float _man_F_max;
-	float _tilt_servo_sp{0.0f}; /**< desired angle for the tilt servo [rad] */
 
 	/*** END-CUSTOM ***/
 
