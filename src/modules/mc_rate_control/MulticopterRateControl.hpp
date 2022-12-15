@@ -64,6 +64,10 @@
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 #include <uORB/topics/vehicle_torque_setpoint.h>
 
+/*** CUSTOM ***/
+#include <uORB/topics/tilting_servo_sp.h>
+/*** END-CUSTOM ***/
+
 using namespace time_literals;
 
 class MulticopterRateControl : public ModuleBase<MulticopterRateControl>, public ModuleParams, public px4::WorkItem
@@ -146,6 +150,7 @@ private:
 	float _control_energy[4] {};
 
 	/*** CUSTOM ***/
+	uORB::Subscription _tilting_servo_sp_sub{ORB_ID(tilting_servo_setpoint)};
 	float _tilting_angle_sp{0.0f}; /**< [rad] angle setpoint for tilting servo motors */
 	matrix::Vector3f _thrust_setpoint{};
 	/*** END-CUSOTM ***/
@@ -188,7 +193,10 @@ private:
 
 		/*** CUSTOM ***/
 		(ParamFloat<px4::params::CA_SV_TL0_MINA>) _param_tilt_min_angle,
-		(ParamFloat<px4::params::CA_SV_TL0_MAXA>) _param_tilt_max_angle
+		(ParamFloat<px4::params::CA_SV_TL0_MAXA>) _param_tilt_max_angle,
+		(ParamInt<px4::params::CA_TILTING_TYPE>)    _param_tilting_type, 	/**< 0:h-tilting, 1:omnidirectional*/
+		(ParamInt<px4::params::CA_AIRFRAME>)	    _param_airframe, 		/**< 11: tilting_multirotors */
+		(ParamInt<px4::params::MC_PITCH_ON_TILT>)   _param_mpc_pitch_on_tilt
 		/*** END-CUSTOM ***/
 	)
 

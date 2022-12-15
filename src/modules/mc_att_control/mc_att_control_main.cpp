@@ -174,6 +174,8 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 
 	/* This change is for the stabilized mode */
 
+	tilting_servo_sp_s servo_sp;
+
 	/*** CUSTOM ***/
 	/*
 	 * Input mapping for X and Y forces manual setpoints
@@ -199,8 +201,8 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 		/* Check if the drone is a H-tilting multirotor */
 		if (_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
 
+			servo_sp.angle[0] = attitude_setpoint.pitch_body;
 			attitude_setpoint.pitch_body = 0.0f;
-			_tilt_servo_sp = euler_sp(1) - 0.0f;
 
 		}
 		else if(_param_tilting_type.get() == 1 ){
@@ -211,10 +213,6 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 			attitude_setpoint.thrust_body[1] = fy_sp;
 
 		}
-	}
-	else{
-
-		_tilt_servo_sp = 0.00f;
 	}
 
 	/*** END-CUSTOM ***/
@@ -270,6 +268,9 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	attitude_setpoint.timestamp = hrt_absolute_time();
 
 	_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
+	/*** CUSTOM ***/
+	_tilting_servo_pub.publish(servo_sp);
+	/*** END-CUSTOM ***/
 
 	// update attitude controller setpoint immediately
 	_attitude_control.setAttitudeSetpoint(q_sp, attitude_setpoint.yaw_sp_move_rate);
@@ -315,63 +316,6 @@ MulticopterAttitudeControl::Run()
 
 			if (_vehicle_attitude_setpoint_sub.copy(&vehicle_attitude_setpoint)
 			    && (vehicle_attitude_setpoint.timestamp > _last_attitude_setpoint)) {
-
-				/*** CUSTOM ***/
-
-				/* This change is for the position flight mode */
-				if(_param_airframe.get() == 11 ){ //If tilting_multirotors
-
-					if(_tilting_mc_angles_sub.updated()){
-
-						tilting_mc_desired_angles_s tilting_mc_angles_sp;
-
-						if (_tilting_mc_angles_sub.copy(&tilting_mc_angles_sp) &&
-						    (tilting_mc_angles_sp.timestamp > _last_angles_setpoint)) {
-
-							// H-tilting multirotor
-							if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
-
-								_tilting_mc_pitch_sp = math::constrain(tilting_mc_angles_sp.pitch_body,
-									_param_des_pitch_min.get(), _param_des_pitch_max.get());
-
-							}
-							else if(_param_tilting_type.get() == 1){
-
-								_tilting_mc_pitch_sp = math::constrain(tilting_mc_angles_sp.pitch_body,
-									_param_des_pitch_min.get(), _param_des_pitch_max.get());
-
-								_tilting_mc_roll_sp = math::constrain(tilting_mc_angles_sp.roll_body,
-									_param_des_roll_min.get(), _param_des_roll_max.get());
-
-								_tilt_servo_sp = 0.00f;
-
-							}
-
-							_last_angles_setpoint = tilting_mc_angles_sp.timestamp;
-						}
-
-					}
-
-					/* For the H-tilting multirotor the tilt_servo angle must always be updated */
-					if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
-						_tilt_servo_sp = vehicle_attitude_setpoint.pitch_body - _tilting_mc_pitch_sp;
-						_tilting_mc_roll_sp = vehicle_attitude_setpoint.roll_body;
-					}
-
-					Quatf q_temp = Eulerf(_tilting_mc_roll_sp, _tilting_mc_pitch_sp, vehicle_attitude_setpoint.yaw_body);
-					vehicle_attitude_setpoint.q_d[0] = q_temp(0);
-					vehicle_attitude_setpoint.q_d[1] = q_temp(1);
-					vehicle_attitude_setpoint.q_d[2] = q_temp(2);
-					vehicle_attitude_setpoint.q_d[3] = q_temp(3);
-
-				}
-				else{
-					_tilt_servo_sp = 0.00f;
-					_tilting_mc_pitch_sp = 0.00f;
-					_tilting_mc_roll_sp = 0.00f;
-				}
-
-				/*** END-CUSTOM ***/
 
 				_attitude_control.setAttitudeSetpoint(Quatf(vehicle_attitude_setpoint.q_d), vehicle_attitude_setpoint.yaw_sp_move_rate);
 				_thrust_setpoint_body = Vector3f(vehicle_attitude_setpoint.thrust_body);
@@ -463,13 +407,6 @@ MulticopterAttitudeControl::Run()
 			v_rates_sp.yaw = rates_sp(2);
 			_thrust_setpoint_body.copyTo(v_rates_sp.thrust_body);
 			v_rates_sp.timestamp = hrt_absolute_time();
-
-			/*** CUSTOM ***/
-			// PX4_INFO("Tilt_sp: %f \n", (double)_tilt_servo_sp);
-			v_rates_sp.tilt_servo = _tilt_servo_sp;
-
-			/*** END-CUSTOM ***/
-
 			_v_rates_sp_pub.publish(v_rates_sp);
 		}
 

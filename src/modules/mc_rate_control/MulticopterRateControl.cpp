@@ -200,6 +200,10 @@ MulticopterRateControl::Run()
 			// use rates setpoint topic
 			vehicle_rates_setpoint_s v_rates_sp;
 
+			/*** CUSTOM ***/
+			tilting_servo_sp_s tilting_servo_sp;
+			/*** END-CUSTOM ***/
+
 			if (_v_rates_sp_sub.update(&v_rates_sp)) {
 				_rates_sp(0) = PX4_ISFINITE(v_rates_sp.roll)  ? v_rates_sp.roll  : rates(0);
 				_rates_sp(1) = PX4_ISFINITE(v_rates_sp.pitch) ? v_rates_sp.pitch : rates(1);
@@ -209,10 +213,16 @@ MulticopterRateControl::Run()
 
 				/*** CUSTOM ***/
 				// PX4_INFO("tilt_sp: %f \n", (double)vehicle_rates_setpoint.tilt_servo);
-				_tilting_angle_sp = v_rates_sp.tilt_servo;
 				_thrust_setpoint = Vector3f(v_rates_sp.thrust_body);
 				/*** END-CUSTOM ***/
 			}
+
+			if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get() && _param_airframe.get() == 11){
+				if(_tilting_servo_sp_sub.update(&tilting_servo_sp))
+					_tilting_angle_sp = tilting_servo_sp.angle[0];
+			}
+			else
+				_tilting_angle_sp = tilting_servo_sp.angle[0] = 0.0f;
 		}
 
 		// run the rate controller
@@ -263,7 +273,9 @@ MulticopterRateControl::Run()
 			actuators.control[actuator_controls_s::INDEX_LANDING_GEAR] = _landing_gear;
 
 			/*** CUSTOM ***/
-			actuators.control[actuator_controls_s::INDEX_FLAPS] = PX4_ISFINITE(_tilting_angle_sp) ? _tilting_angle_sp : 0.0f;
+			if(_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get() && _param_airframe.get() == 11){
+				actuators.control[actuator_controls_s::INDEX_FLAPS] = PX4_ISFINITE(_tilting_angle_sp) ? _tilting_angle_sp : 0.0f;
+			}
 			/*** END-CUSTOM ***/
 
 			actuators.timestamp_sample = angular_velocity.timestamp_sample;
