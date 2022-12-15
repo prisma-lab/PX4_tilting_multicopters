@@ -174,6 +174,8 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 
 	/* This change is for the stabilized mode */
 
+	tilting_servo_sp_s servo_sp;
+
 	/*** CUSTOM ***/
 	/*
 	 * Input mapping for X and Y forces manual setpoints
@@ -199,6 +201,7 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 		/* Check if the drone is a H-tilting multirotor */
 		if (_param_tilting_type.get() == 0 && _param_mpc_pitch_on_tilt.get()){
 
+			servo_sp.angle[0] = attitude_setpoint.pitch_body;
 			attitude_setpoint.pitch_body = 0.0f;
 
 		}
@@ -265,6 +268,9 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 	attitude_setpoint.timestamp = hrt_absolute_time();
 
 	_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
+	/*** CUSTOM ***/
+	_tilting_servo_pub.publish(servo_sp);
+	/*** END-CUSTOM ***/
 
 	// update attitude controller setpoint immediately
 	_attitude_control.setAttitudeSetpoint(q_sp, attitude_setpoint.yaw_sp_move_rate);

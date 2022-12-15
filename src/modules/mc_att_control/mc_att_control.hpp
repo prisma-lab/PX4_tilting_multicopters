@@ -59,6 +59,7 @@
 
 /*** CUSTOM ***/
 #include <uORB/topics/tilting_mc_desired_angles.h>
+#include <uORB/topics/tilting_servo_sp.h>
 /*** END-CUSTOM ***/
 
 #include <AttitudeControl.hpp>
@@ -144,7 +145,7 @@ private:
 	uint8_t _quat_reset_counter{0};
 
 	/*** CUSTOM ***/
-
+	uORB::Publication<tilting_servo_sp_s>	_tilting_servo_pub{ORB_ID(tilting_servo_setpoint)};
 	AlphaFilter<float> _man_Fx_input_filter;
 	AlphaFilter<float> _man_Fy_input_filter;
 	float _man_F_max;
