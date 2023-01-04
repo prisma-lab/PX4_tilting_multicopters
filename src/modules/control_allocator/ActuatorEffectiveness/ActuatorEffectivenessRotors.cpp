@@ -196,7 +196,7 @@ ActuatorEffectivenessRotors::addActuators(Configuration &configuration)
 int
 ActuatorEffectivenessRotors::computeEffectivenessMatrix(const Geometry &geometry,
 		EffectivenessMatrix &effectiveness, int actuator_start_index,
-		bool tilting_omnidir, bool ver_lat)
+		bool tilting_omnidir, bool horizontal_matrix)
 /*** END-CUSTOM ***/
 {
 	int num_actuators = 0;
@@ -292,7 +292,7 @@ ActuatorEffectivenessRotors::computeEffectivenessMatrix(const Geometry &geometry
 
 			// TO DO: check if is better to use ct here or not
 
-			if( !ver_lat ){
+			if( !horizontal_matrix ){
 				// Mx vertical
 				effectiveness(0, i + actuator_start_index) = -ct * position(1);
 				// My vertical

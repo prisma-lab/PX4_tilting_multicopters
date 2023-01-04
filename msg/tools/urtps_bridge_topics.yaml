@@ -89,3 +89,7 @@ rtps:
     send:    true
   - msg:     sensor_combined
     send:    true
+#*** CUSTOM ***
+  - msg:     tilting_mc_desired_angles
+    send:    true
+#*** END-CUSTOM ***

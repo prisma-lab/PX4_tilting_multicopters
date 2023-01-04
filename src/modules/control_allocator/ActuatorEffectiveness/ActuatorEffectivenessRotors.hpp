@@ -105,7 +105,7 @@ public:
 	static int computeEffectivenessMatrix(const Geometry &geometry,
 					      EffectivenessMatrix &effectiveness, int actuator_start_index = 0,
 					      bool tilting_omnidir = false,
-					      bool vert_lat = false);
+					      bool horizontal_matrix = false);
 	/*** END-CUSTOM ***/
 
 	// static int computeEffectivenessMatrix(const Geometry &geometry,
