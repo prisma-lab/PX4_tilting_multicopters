@@ -176,11 +176,11 @@ PARAM_DEFINE_INT32(MC_PITCH_ON_TILT, 0);
  *
  * @unit N
  * @min 0.0
- * @max 1.0
+ * @max 5.0
  * @decimal 2
  * @group Multicopter Attitude Control
 */
-PARAM_DEFINE_FLOAT(MC_MAX_FXY, 0.05f);
+PARAM_DEFINE_FLOAT(MC_MAX_FXY, 0.15f);
 
 
 // *** END-CUSTOM ***
