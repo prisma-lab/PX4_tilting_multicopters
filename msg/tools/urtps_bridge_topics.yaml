@@ -91,5 +91,6 @@ rtps:
     send:    true
 #*** CUSTOM ***
   - msg:     tilting_mc_desired_angles
+    receive: true
     send:    true
 #*** END-CUSTOM ***
