@@ -36,6 +36,7 @@
 #include "ActuatorEffectiveness.hpp"
 #include "ActuatorEffectivenessRotors.hpp"
 #include "ActuatorEffectivenessTilts.hpp"
+#include <px4_platform_common/module_params.h>
 
 #include <uORB/topics/actuator_controls.h>
 #include <uORB/Subscription.hpp>
@@ -93,6 +94,22 @@ protected:
 	float _last_tilt_control{NAN};
 	bool _tilt_updated{true};
 	int32_t _tilting_type{0};
+
+	static constexpr int NUM_SERVOS_MAX = 5;
+	struct ServoParamHandles{
+		param_t angle_min;
+		param_t angle_max;
+	};
+	param_t _servo_count_handle;
+	int32_t _servo_count{0};
+
+	struct ServoParam{
+		float angle_min;
+		float angle_max;
+	};
+	
+	ServoParamHandles _servo_param_handles[NUM_SERVOS_MAX];
+	ServoParam _servo_param[NUM_SERVOS_MAX];
 
 	uORB::Subscription _actuator_controls_0_sub{ORB_ID(actuator_controls_0)};
 };

@@ -337,9 +337,10 @@ void MulticopterRateControl::publishThrustSetpoint(const hrt_abstime &timestamp_
 	vehicle_thrust_setpoint_s v_thrust_sp = {};
 	v_thrust_sp.timestamp = hrt_absolute_time();
 	v_thrust_sp.timestamp_sample = timestamp_sample;
+	/*** CUSTOM ***/
 	// v_thrust_sp.xyz[0] = 0.0f;
 	// v_thrust_sp.xyz[1] = 0.0f;
-	/*** CUSTOM ***/
+
 	_thrust_setpoint.copyTo(v_thrust_sp.xyz);
 	/*** END-CUSTOM ***/
 	v_thrust_sp.xyz[2] = PX4_ISFINITE(_thrust_sp) ? -_thrust_sp : 0.0f; // Z is Down

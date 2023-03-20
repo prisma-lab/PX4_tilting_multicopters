@@ -129,4 +129,4 @@ PARAM_DEFINE_FLOAT(HTE_VZ_THR, 2.0);
  * @unit normalized_thrust
  * @group Hover Thrust Estimator
  */
-PARAM_DEFINE_FLOAT(HTE_THR_RANGE, 0.4);
+PARAM_DEFINE_FLOAT(HTE_THR_RANGE, 0.3);

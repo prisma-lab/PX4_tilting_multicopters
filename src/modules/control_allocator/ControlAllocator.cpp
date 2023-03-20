@@ -443,13 +443,14 @@ ControlAllocator::Run()
 			//Vertical forces
 			_control_allocation[0]->setControlSetpoint(c[0]);
 			_control_allocation[0]->allocate();
-			vertical_actuator_sp = _control_allocation[0]->_actuator_sp;
+			vertical_actuator_sp = _control_allocation[0]->getActuatorSetpoint();
 
 			//Lateral forces
 			_control_allocation[1]->setControlSetpoint(c[0]);
 			_control_allocation[1]->allocate();
-			lateral_actuator_sp = _control_allocation[1]->_actuator_sp;
-
+			lateral_actuator_sp = _control_allocation[1]->getActuatorSetpoint();//_control_allocation[1]->getActuatorSetpoint();
+			// PX4_INFO("v_sp %d : %f ", 0, (double)lateral_actuator_sp(0));
+			
 			//Rotors
 			for(int i=0; i<_num_actuators[0]; i++){
 
@@ -459,43 +460,55 @@ ControlAllocator::Run()
 			}
 
 			//Tilts
-			int j=0;
-			for(int i=_num_actuators[0]; i<(_num_actuators[0]+_num_actuators[1]); i++){
-				j = i - _num_actuators[0];
+			for(int i=0; i<_num_actuators[1]; i++){
 
-				if(lateral_actuator_sp(j) < 0.1f || vertical_actuator_sp(j) < 0.1f)
-					actuator_sp(i) = 0.00f;
-				else
-					actuator_sp(i) = atan2f(lateral_actuator_sp(j),vertical_actuator_sp(j));
+				if(vertical_actuator_sp(i) < 0.01f){
+					servo_sp(i) = 0.00f;
+					// PX4_INFO("tilt_true %d : %f ", i, (double)servo_sp(i));
+				}
+				else{
+					servo_sp(i) = atan2f(lateral_actuator_sp(i),vertical_actuator_sp(i));
+					// PX4_INFO("tilt %d : %f ", i, (double)servo_sp(i));
+				}
 				// PX4_INFO("Lat: %f", (double)lateral_actuator_sp(j));
 				// PX4_INFO("Vert: %f", (double)vertical_actuator_sp(j));
-				// PX4_INFO("tilt %d : %f ", j, (double)actuator_sp(j));
+
 			}
 
 			matrix::Vector<float, NUM_ACTUATORS> actuatorMax, actuatorMin;
+			matrix::Vector<float, NUM_ACTUATORS> servoMax, servoMin;
 
 			for(int i=0; i<_num_actuators[0]; i++){
 				actuatorMax(i) = 1.0f;
 				actuatorMin(i) = 0.00f;
 			}
-			for(int i=_num_actuators[0]; i<(_num_actuators[0]+_num_actuators[1]); i++){
-				actuatorMax(i) =  1.0f;
-				actuatorMin(i) = -1.0f;
-			}
 			_control_allocation[0]->setActuatorMax(actuatorMax);
 			_control_allocation[0]->setActuatorMin(actuatorMin);
 
+			for(int i=0; i<_num_actuators[1]; i++){
+				servoMax(i) =  1.00f;
+				servoMin(i) = -1.00f;
+			}
+
+			_control_allocation[1]->setActuatorMax(servoMax);
+			_control_allocation[1]->setActuatorMin(servoMin);
+			
+
 			_control_allocation[0]->setActuatorSetpoint(actuator_sp);
+			_control_allocation[1]->setActuatorSetpoint(servo_sp);
 
 			_actuator_effectiveness->updateSetpoint(c[0], 0, _control_allocation[0]->_actuator_sp);
+			_actuator_effectiveness->updateSetpoint(c[1], 1, _control_allocation[1]->_actuator_sp);
 
 			if (_has_slew_rate) {
 				_control_allocation[0]->applySlewRateLimit(dt);
+				_control_allocation[1]->applySlewRateLimit(dt);
 
 			}
 
 			//Here the _actuator_sp is clipped and saved to be published
 			_control_allocation[0]->clipActuatorSetpoint();
+			_control_allocation[1]->clipActuatorSetpoint();
 
 		}
 		/*** END-CUSTOM ***/

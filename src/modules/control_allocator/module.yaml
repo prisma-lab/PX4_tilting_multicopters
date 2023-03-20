@@ -54,8 +54,8 @@ parameters:
                   while fully actuated drones have 6 degree of freedom.
             type: enum
             values:
-                0: One tilt degree
-                1: Fully actuated
+                0: One tilt
+                1: Omnidirectional
             default: 0
         #*** END-CUSTOM ***
 

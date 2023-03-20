@@ -137,7 +137,6 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 		const float yaw_rate = math::radians(_param_mpc_man_y_max.get());
 		attitude_setpoint.yaw_sp_move_rate = _manual_control_setpoint.r * yaw_rate;
 		_man_yaw_sp = wrap_pi(_man_yaw_sp + attitude_setpoint.yaw_sp_move_rate * dt);
-
 	}
 
 	/*
@@ -269,6 +268,7 @@ MulticopterAttitudeControl::generate_attitude_setpoint(const Quatf &q, float dt,
 
 	_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
 	/*** CUSTOM ***/
+	servo_sp.timestamp = hrt_absolute_time();
 	_tilting_servo_pub.publish(servo_sp);
 	/*** END-CUSTOM ***/
 

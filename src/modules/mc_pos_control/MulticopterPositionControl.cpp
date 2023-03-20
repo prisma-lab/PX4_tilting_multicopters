@@ -512,7 +512,7 @@ void MulticopterPositionControl::Run()
 
 			/*** CUSTOM ***/
 			if(_param_airframe.get() == 11 ){ //If tilting_multirotors
-
+				
 				/* Evaluate forces for fully actuated tilting multirotor*/
 				if(_param_tilting_type.get() == 1){
 					const float sin_yaw = sinf(attitude_setpoint.yaw_body);
@@ -571,7 +571,7 @@ void MulticopterPositionControl::Run()
 
 			}
 			/*** END-CUSTOM ***/
-
+			
 			Quatf q_temp = Eulerf(attitude_setpoint.roll_body, attitude_setpoint.pitch_body, attitude_setpoint.yaw_body);
 			attitude_setpoint.q_d[0] = q_temp(0);
 			attitude_setpoint.q_d[1] = q_temp(1);
