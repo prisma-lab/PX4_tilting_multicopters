@@ -311,9 +311,9 @@ ActuatorEffectivenessRotors::computeEffectivenessMatrix(const Geometry &geometry
 			else{
 
 				// Mx horizontal
-				effectiveness(0, i + actuator_start_index) = ct * position(2) * cos_rotor + sin_rotor * km*ct;
+				effectiveness(0, i + actuator_start_index) = sin_rotor * km*ct;
 				// My horizontal
-				effectiveness(1, i + actuator_start_index) = ct * position(2) * sin_rotor - cos_rotor * km*ct;
+				effectiveness(1, i + actuator_start_index) =  - cos_rotor * km*ct;
 				// Mz horizontal
 				effectiveness(2, i + actuator_start_index) = ct * sqrt(powf(position(0),2) + powf(position(1),2) ); //(position(0) * cos_rotor + position(1) * sin_rotor);
 

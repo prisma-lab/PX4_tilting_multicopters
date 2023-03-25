@@ -461,17 +461,17 @@ ControlAllocator::Run()
 
 			//Tilts
 			for(int i=0; i<_num_actuators[1]; i++){
-
-				if(vertical_actuator_sp(i) < 0.01f){
+					
+				if( vertical_actuator_sp(i) < 0.1f){
 					servo_sp(i) = 0.00f;
 					// PX4_INFO("tilt_true %d : %f ", i, (double)servo_sp(i));
 				}
 				else{
 					servo_sp(i) = atan2f(lateral_actuator_sp(i),vertical_actuator_sp(i));
-					// PX4_INFO("tilt %d : %f ", i, (double)servo_sp(i));
+					PX4_INFO("tilt %d : %f ", i, (double)servo_sp(i));
 				}
-				// PX4_INFO("Lat: %f", (double)lateral_actuator_sp(j));
-				// PX4_INFO("Vert: %f", (double)vertical_actuator_sp(j));
+				// PX4_INFO("Lat: %f", (double)lateral_actuator_sp(i));
+				// PX4_INFO("Vert: %f", (double)vertical_actuator_sp(i));
 
 			}
 
@@ -482,33 +482,34 @@ ControlAllocator::Run()
 				actuatorMax(i) = 1.0f;
 				actuatorMin(i) = 0.00f;
 			}
+
+			for(int i=_num_actuators[0]; i<(_num_actuators[0]+_num_actuators[1]); i++){
+				actuatorMax(i) =  1.0f;
+				actuatorMin(i) = -1.0f;
+			}
 			_control_allocation[0]->setActuatorMax(actuatorMax);
 			_control_allocation[0]->setActuatorMin(actuatorMin);
 
-			for(int i=0; i<_num_actuators[1]; i++){
-				servoMax(i) =  1.00f;
-				servoMin(i) = -1.00f;
-			}
-
-			_control_allocation[1]->setActuatorMax(servoMax);
-			_control_allocation[1]->setActuatorMin(servoMin);
-			
+			// _control_allocation[1]->setActuatorMax(actuatorMax);
+			// _control_allocation[1]->setActuatorMin(actuatorMin);			
 
 			_control_allocation[0]->setActuatorSetpoint(actuator_sp);
 			_control_allocation[1]->setActuatorSetpoint(servo_sp);
 
+			//To do: check servo sp e actuator sp, uno è angolo e l'altro è pwm
+
 			_actuator_effectiveness->updateSetpoint(c[0], 0, _control_allocation[0]->_actuator_sp);
-			_actuator_effectiveness->updateSetpoint(c[1], 1, _control_allocation[1]->_actuator_sp);
+			// _actuator_effectiveness->updateSetpoint(c[1], 1, _control_allocation[1]->_actuator_sp);
 
 			if (_has_slew_rate) {
 				_control_allocation[0]->applySlewRateLimit(dt);
-				_control_allocation[1]->applySlewRateLimit(dt);
+				// _control_allocation[1]->applySlewRateLimit(dt);
 
 			}
 
 			//Here the _actuator_sp is clipped and saved to be published
 			_control_allocation[0]->clipActuatorSetpoint();
-			_control_allocation[1]->clipActuatorSetpoint();
+			// _control_allocation[1]->clipActuatorSetpoint();
 
 		}
 		/*** END-CUSTOM ***/
