@@ -468,7 +468,7 @@ ControlAllocator::Run()
 				}
 				else{
 					servo_sp(i) = atan2f(lateral_actuator_sp(i),vertical_actuator_sp(i));
-					PX4_INFO("tilt %d : %f ", i, (double)servo_sp(i));
+					// PX4_INFO("tilt %d : %f ", i, (double)servo_sp(i));
 				}
 				// PX4_INFO("Lat: %f", (double)lateral_actuator_sp(i));
 				// PX4_INFO("Vert: %f", (double)vertical_actuator_sp(i));
