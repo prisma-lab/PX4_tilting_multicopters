@@ -16,11 +16,11 @@ This repo will be filled with all necessary data and documentation after that th
 ## Video
 https://youtu.be/N61GHj4W_II
 
-## How to use
+# How to use
 Clone the repository with submodules
 $ git clone --recurse-submodule https://github.com/prisma-lab/PX4_tilting_multicopters.git
 
-# Run the simulation
+## Run the simulation
 For omnidirectional tilting drone
 $ make px4_sitl gazebo_NDT_tilting
 
