@@ -58,6 +58,7 @@
 #include <uORB/SubscriptionCallback.hpp>
 #include <uORB/topics/vehicle_attitude.h>
 #include <uORB/topics/tilting_mc_desired_angles.h>
+#include <uORB/topics/null_space_vector.h>
 #include <mathlib/math/Functions.hpp>
 #include <matrix/matrix/math.hpp>
 
@@ -78,86 +79,98 @@ int angles_test_main(int argc, char *argv[])
 	PX4_INFO("Angles test");
 
 	/* advertise tilting_angles topic */
-	struct tilting_mc_desired_angles_s angles;
-	float des_pitch = 0.0f;
-	float des_roll = 0.0f;
-	float pitch = 0.0f;
-	float roll = 0.0f;
-	float dt = 0.01f;
-	bool p = false;
-	bool r = false;
-	uORB::Publication<tilting_mc_desired_angles_s> tilting_angles_pub{ORB_ID(tilting_mc_desired_angles)};
-	uORB::Subscription vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
-	hrt_abstime stime;
-	vehicle_attitude_s att;
+	// struct tilting_mc_desired_angles_s angles;
+	// float des_pitch = 0.0f;
+	// float des_roll = 0.0f;
+	// float pitch = 0.0f;
+	// float roll = 0.0f;
+	// float dt = 0.01f;
+	// bool p = false;
+	// bool r = false;
+	// uORB::Publication<tilting_mc_desired_angles_s> tilting_angles_pub{ORB_ID(tilting_mc_desired_angles)};
+	uORB::Publication<null_space_vector_s> null_vector_pub{ORB_ID(null_space_vector)};
 
-	float tf = (float)atof(argv[3]);
-	float des_angle = (float)atof(argv[2]) * M_DEG_TO_RAD_F;
+	// uORB::Subscription vehicle_attitude_sub{ORB_ID(vehicle_attitude)};
 
-	if( strcmp(argv[1], "p") == 0 ){
-		des_pitch = des_angle;
-		des_roll = 0.0f;
-		p = true;
-		PX4_INFO("Publish %2.2f° pitch in %2.2f s, starting from %2.3f", (double)des_angle, (double)tf, (double)pitch);
-	}
-	else if ( strcmp(argv[1], "r") == 0 ){
-		des_roll = des_angle;
-		des_pitch = 0.0f;
-		r = true;
-		PX4_INFO("Publish %2.2f° roll in %2.2f s", (double)des_angle, (double)tf);
-	}
-	else if ( strcmp(argv[1], "b") == 0 ){
-		des_roll = des_pitch = des_angle;
-		p = r = true;
-		PX4_INFO("Publish %2.2f° both in %2.2f s", (double)des_angle, (double)tf);
-	}
+	// hrt_abstime stime;
+	// vehicle_attitude_s att;
+	null_space_vector_s null_vec;
 
-	stime = hrt_absolute_time();
-	while( (hrt_absolute_time() - stime) < 5000 ){
-		if (vehicle_attitude_sub.updated()) {
+	// float tf = (float)atof(argv[3]);
+	// float des_angle = (float)atof(argv[2]) * M_DEG_TO_RAD_F;
 
-			if (vehicle_attitude_sub.copy(&att)) {
-				matrix::Quatf q{att.q};
-				pitch = matrix::Eulerf(q).theta();
-				roll = matrix::Eulerf(q).phi();
-			}
-		}
-	}
+	// if( strcmp(argv[1], "p") == 0 ){
+	// 	des_pitch = des_angle;
+	// 	des_roll = 0.0f;
+	// 	p = true;
+	// 	PX4_INFO("Publish %2.2f° pitch in %2.2f s, starting from %2.3f", (double)des_angle, (double)tf, (double)pitch);
+	// }
+	// else if ( strcmp(argv[1], "r") == 0 ){
+	// 	des_roll = des_angle;
+	// 	des_pitch = 0.0f;
+	// 	r = true;
+	// 	PX4_INFO("Publish %2.2f° roll in %2.2f s", (double)des_angle, (double)tf);
+	// }
+	// else if ( strcmp(argv[1], "b") == 0 ){
+	// 	des_roll = des_pitch = des_angle;
+	// 	p = r = true;
+	// 	PX4_INFO("Publish %2.2f° both in %2.2f s", (double)des_angle, (double)tf);
+	// }
 
-	int steps = lround(tf/dt);
-	matrix::Vector<float,4> coeff;
-	if(p && !r)
-		coeff = coefficients(pitch, des_pitch, tf);
-	else if(r && !p)
-		coeff = coefficients(roll, des_roll, tf);
+	// stime = hrt_absolute_time();
+	// while( (hrt_absolute_time() - stime) < 5000 ){
+	// 	if (vehicle_attitude_sub.updated()) {
 
-	// float s = 0.0f;
-	stime = hrt_absolute_time();
+	// 		if (vehicle_attitude_sub.copy(&att)) {
+	// 			matrix::Quatf q{att.q};
+	// 			pitch = matrix::Eulerf(q).theta();
+	// 			roll = matrix::Eulerf(q).phi();
+	// 		}
+	// 	}
+	// }
+
+	// int steps = lround(tf/dt);
+	// matrix::Vector<float,4> coeff;
+	// if(p && !r)
+	// 	coeff = coefficients(pitch, des_pitch, tf);
+	// else if(r && !p)
+	// 	coeff = coefficients(roll, des_roll, tf);
+
+	// // float s = 0.0f;
+	// stime = hrt_absolute_time();
 	int count = 0;
 	// int t = 0.0f;
-	while(count < steps){
-		if((hrt_absolute_time() - stime) > 7000){
+	while(count < 10000){
+		// if((hrt_absolute_time() - stime) > 7000){
 
-			//dt = dt*powf(10,-6);
-			// s = coeff(3)*powf(t,3) + coeff(2)*powf(t,2) + coeff(1)*t + coeff(0);
+		// 	//dt = dt*powf(10,-6);
+		// 	// s = coeff(3)*powf(t,3) + coeff(2)*powf(t,2) + coeff(1)*t + coeff(0);
 
-			if(p && !r){
-				// angles.pitch_body = pitch + dt *( (des_pitch-pitch))/(sqrtf(powf(des_pitch,2) - powf(pitch,2)));
-				angles.pitch_body = pitch + (des_pitch - pitch) * count/steps;
-				angles.roll_body = 0.0f;
-			}
-			else if(r && !p){
-				angles.roll_body = roll + (des_roll - roll) * count/steps;
-				angles.pitch_body = 0.0f;
-			}
-			angles.timestamp = hrt_absolute_time();
-			tilting_angles_pub.publish(angles);
-			PX4_INFO("%d angle: %2.2f",count, (double)angles.pitch_body);
+		// 	if(p && !r){
+		// 		// angles.pitch_body = pitch + dt *( (des_pitch-pitch))/(sqrtf(powf(des_pitch,2) - powf(pitch,2)));
+		// 		angles.pitch_body = pitch + (des_pitch - pitch) * count/steps;
+		// 		angles.roll_body = 0.0f;
+		// 	}
+		// 	else if(r && !p){
+		// 		angles.roll_body = roll + (des_roll - roll) * count/steps;
+		// 		angles.pitch_body = 0.0f;
+		// 	}
+		// 	angles.timestamp = hrt_absolute_time();
+		// 	tilting_angles_pub.publish(angles);
+		// 	PX4_INFO("%d angle: %2.2f",count, (double)angles.pitch_body);
 
 
-			count++;
-			stime = hrt_absolute_time();
-		}
+		// 	count++;
+		// 	stime = hrt_absolute_time();
+		// }
+
+		null_vec.timestamp = hrt_absolute_time();
+		
+		for(int i=0; i<16; i++)
+			null_vec.value[i] = 1.0f;
+
+
+		null_vector_pub.publish(null_vec);
 	}
 
 	PX4_INFO("Done!");

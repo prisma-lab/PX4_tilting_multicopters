@@ -209,6 +209,7 @@ set(msg_files
 	#*** CUSTOM
 	tilting_mc_desired_angles.msg
 	tilting_servo_sp.msg
+	null_space_vector.msg
 	#*** END-CUSTOM
 )
 

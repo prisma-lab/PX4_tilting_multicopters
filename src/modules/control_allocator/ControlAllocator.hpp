@@ -76,6 +76,9 @@
 #include <uORB/topics/vehicle_torque_setpoint.h>
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
+/*** CUSTOM ***/
+#include <uORB/topics/null_space_vector.h>
+/*** END-CUSTOM ***/
 
 class ControlAllocator : public ModuleBase<ControlAllocator>, public ModuleParams, public px4::ScheduledWorkItem
 {
@@ -165,6 +168,9 @@ private:
 	// Inputs
 	uORB::SubscriptionCallbackWorkItem _vehicle_torque_setpoint_sub{this, ORB_ID(vehicle_torque_setpoint)};  /**< vehicle torque setpoint subscription */
 	uORB::SubscriptionCallbackWorkItem _vehicle_thrust_setpoint_sub{this, ORB_ID(vehicle_thrust_setpoint)};	 /**< vehicle thrust setpoint subscription */
+	/*** CUSTOM ***/
+	uORB::SubscriptionCallbackWorkItem _null_space_vector_sub{this, ORB_ID(null_space_vector)};
+	/*** END-CUSTOM ***/
 
 	uORB::Subscription _vehicle_torque_setpoint1_sub{ORB_ID(vehicle_torque_setpoint), 1};  /**< vehicle torque setpoint subscription (2. instance) */
 	uORB::Subscription _vehicle_thrust_setpoint1_sub{ORB_ID(vehicle_thrust_setpoint), 1};	 /**< vehicle thrust setpoint subscription (2. instance) */
@@ -182,6 +188,9 @@ private:
 
 	matrix::Vector3f _torque_sp;
 	matrix::Vector3f _thrust_sp;
+	/*** CUSTOM ***/
+	matrix::Vector<float,NUM_ACTUATORS> _null_vector;
+	/*** END-CUSTOM ***/
 
 	perf_counter_t	_loop_perf;			/**< loop duration performance counter */
 

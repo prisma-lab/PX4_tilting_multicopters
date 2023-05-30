@@ -308,6 +308,7 @@ ControlAllocator::Run()
 	matrix::Vector<float, NUM_ACTUATORS> lateral_actuator_sp;
 	matrix::Vector<float, NUM_ACTUATORS> actuator_sp;
 	matrix::Vector<float, NUM_ACTUATORS> servo_sp;
+	null_space_vector_s null_vector_setpoint;
 
 	/*** END-CUSTOM ***/
 
@@ -385,6 +386,17 @@ ControlAllocator::Run()
 		}
 	}
 
+	/*** CUSTOM ***/
+	// Check for null_vector updates
+	if(_null_space_vector_sub.update(&null_vector_setpoint)){
+		_null_vector = matrix::Vector<float,NUM_ACTUATORS>(null_vector_setpoint.value);
+
+		do_update = true;
+		_timestamp_sample = null_vector_setpoint.timestamp_sample;
+		// PX4_INFO("null_sp size: %d, val: %f %f %f ",_null_vector.size(), _null_vector(0), _null_vector(0), _null_vector(0));
+	}
+	/*** END-CUSTOM ***/
+
 	if (do_update) {
 		_last_run = now;
 
@@ -450,7 +462,14 @@ ControlAllocator::Run()
 			_control_allocation[1]->allocate();
 			lateral_actuator_sp = _control_allocation[1]->getActuatorSetpoint();//_control_allocation[1]->getActuatorSetpoint();
 			// PX4_INFO("v_sp %d : %f ", 0, (double)lateral_actuator_sp(0));
-			
+
+			//Null-space projected vector
+			for (int i=0; i< _num_actuators[0]; i++){
+				vertical_actuator_sp(i) += _null_vector(2*i);
+				lateral_actuator_sp(i) += _null_vector(2*i+1);
+				PX4_INFO("null_sp %d : %f  ,  %f",i,(double)_null_vector(2*i),(double)_null_vector(2*i+1));
+			}
+						
 			//Rotors
 			for(int i=0; i<_num_actuators[0]; i++){
 
