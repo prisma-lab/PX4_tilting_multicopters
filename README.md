@@ -7,8 +7,6 @@ The description of the firmware architecture, the integration with the standard 
 
 ``Salvatore Marcellini, Jonathan Cacace, Vincenzo Lippiello, "A PX4 Integrated Framework for Modeling and Controlling Multicopters with Tiltable Rotors", submitted to the 2023 International Conference on Unmanned Aircraft System (ICUAS ’23)  June 6 – 9, 2023  Warsaw, Poland``
 
-This work is currently under review
-
 ## Video
 https://youtu.be/N61GHj4W_II
 
